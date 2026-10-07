@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medicine Reminder and Info</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{min-height:100vh;background:#eaf5ff;color:#123b63}
+.header{position:relative;overflow:hidden;background:#0878d1;color:white;padding:35px 20px 45px;text-align:center}
+.header::before{content:"💊   💉   ⚕   💊   🩺   💊   ✚   💊   🧴";position:absolute;top:10px;left:0;width:100%;color:rgba(255,255,255,.22);font-size:35px;word-spacing:25px;white-space:nowrap;transform:rotate(-5deg)}
+.header::after{content:"💊   ✚   🩹   💊   ⚕   💊   🩺   ✚";position:absolute;bottom:5px;left:-20px;width:110%;color:rgba(255,255,255,.20);font-size:30px;word-spacing:30px;white-space:nowrap;transform:rotate(4deg)}
+.capsule{position:relative;z-index:2;width:100px;height:45px;margin:5px auto 18px;border-radius:50px;background:linear-gradient(to right,white 0%,white 50%,#ff4d5a 50%,#ff4d5a 100%);border:3px solid rgba(255,255,255,.9);transform:rotate(-25deg);box-shadow:0 6px 15px rgba(0,0,0,.2)}
+.header h1{position:relative;z-index:2;font-size:30px;margin-bottom:8px}
+.header p{position:relative;z-index:2;font-size:15px}
+.container{width:92%;max-width:650px;margin:-15px auto 30px;position:relative;z-index:5;background:white;padding:28px;border-radius:20px;box-shadow:0 8px 30px rgba(0,0,0,.12)}
+label{display:block;margin:16px 0 7px;font-size:16px;font-weight:bold;color:#124a78}
+input,select{width:100%;padding:13px;border:2px solid #d1e3f1;border-radius:10px;background:#fff;font-size:16px;color:#173b5d;outline:none}
+input:focus,select:focus{border-color:#0878d1}
+.row{display:flex;gap:15px}.column{flex:1}#thirdTimeBox{display:none}
+button{width:100%;border:none;padding:15px;margin-top:20px;border-radius:11px;font-size:17px;font-weight:bold;cursor:pointer;color:white;background:#0878d1}
+button:hover{background:#0564ae}.testButton{background:#18a568}.testButton:hover{background:#128652}
+#status{margin-top:18px;padding:13px;border-radius:10px;background:#edf7ff;color:#075c91;text-align:center;font-weight:bold}
+.info{margin-top:25px;padding:20px;border-radius:15px;background:#f0f8ff}.info h2{color:#0878d1;margin-bottom:10px}.info p{line-height:1.6;font-size:14px;color:#4d5f70}
+.footer{text-align:center;padding:20px;color:#60798d;font-size:13px}
+@media(max-width:550px){.header h1{font-size:24px}.container{padding:20px}.row{flex-direction:column;gap:0}}
+</style>
+</head>
+<body>
+<header class="header">
+<div class="capsule"></div>
+<h1>Medicine Reminder and Info</h1>
+<p>Stay on time with your medicine reminders</p>
+</header>
+
+<div class="container">
+<label for="language">Language / மொழி</label>
+<select id="language">
+<option value="en">English</option>
+<option value="ta">தமிழ்</option>
+</select>
+
+<label for="medicineName">Medicine Name / மருந்தின் பெயர்</label>
+<input type="text" id="medicineName" placeholder="Enter medicine name">
+
+<div class="row">
+<div class="column">
+<label for="startDate">Start Date</label>
+<input type="date" id="startDate">
+</div>
+<div class="column">
+<label for="endDate">End Date</label>
+<input type="date" id="endDate">
+</div>
+</div>
+
+<label>Reminder Time / நினைவூட்டும் நேரம்</label>
+<div class="row">
+<div class="column">
+<label for="time1">First Reminder</label>
+<input type="time" id="time1">
+</div>
+<div class="column">
+<label for="time2">Second Reminder</label>
+<input type="time" id="time2">
+</div>
+</div>
+
+<div id="thirdTimeBox">
+<label for="time3">Third Reminder</label>
+<input type="time" id="time3">
+</div>
+
+<label for="frequency">Frequency / எத்தனை முறை</label>
+<select id="frequency">
+<option value="once">Once</option>
+<option value="twice">Twice</option>
+<option value="thrice">Thrice</option>
+</select>
+
+<button onclick="setReminder()">🔔 Set Medicine Reminder</button>
+<button class="testButton" onclick="testAudio()">🔊 Test Audio Reminder</button>
+
+<div id="status">No reminder set</div>
+
+<div class="info">
+<h2>💊 Medicine Information</h2>
+<p>This website is a medicine reminder tool. It provides notification and audio reminders at your selected times.</p>
+</div>
+</div>
+
+<div class="footer">Medicine Reminder and Info © 2026</div>
+
+<script>
+let reminder=null;
+let lastTriggered="";
+let language="en";
+
+document.getElementById("language").addEventListener("change",function(){
+language=this.value;
+});
+
+document.getElementById("frequency").addEventListener("change",function(){
+const thirdBox=document.getElementById("thirdTimeBox");
+thirdBox.style.display=this.value==="thrice"?"block":"none";
+});
+
+function setReminder(){
+const medicine=document.getElementById("medicineName").value.trim();
+const startDate=document.getElementById("startDate").value;
+const endDate=document.getElementById("endDate").value;
+const time1=document.getElementById("time1").value;
+const time2=document.getElementById("time2").value;
+const time3=document.getElementById("time3").value;
+const frequency=document.getElementById("frequency").value;
+
+if(medicine===""||startDate===""||endDate===""||time1===""){
+alert(language==="ta"?"தயவுசெய்து தேவையான தகவல்களை நிரப்பவும்.":"Please fill in the required details.");
+return;
+}
+
+if((frequency==="twice"||frequency==="thrice")&&time2===""){
+alert(language==="ta"?"இரண்டாவது Reminder Time கொடுக்கவும்.":"Please enter the second reminder time.");
+return;
+}
+
+if(frequency==="thrice"&&time3===""){
+alert(language==="ta"?"மூன்றாவது Reminder Time கொடுக்கவும்.":"Please enter the third reminder time.");
+return;
+}
+
+if(endDate<startDate){
+alert(language==="ta"?"End Date, Start Date-க்கு பிறகு இருக்க வேண்டும்.":"End Date must be on or after Start Date.");
+return;
+}
+
+reminder={medicine,startDate,endDate,time1,time2,time3,frequency};
+
+if("Notification" in window){
+Notification.requestPermission();
+}
+
+document.getElementById("status").innerText=language==="ta"?"✅ Medicine Reminder அமைக்கப்பட்டது.":"✅ Medicine Reminder has been set.";
+
+const message=language==="ta"
+?medicine+" மருந்துக்கான நினைவூட்டல் அமைக்கப்பட்டது."
+:"Medicine reminder for "+medicine+" has been set.";
+speak(message);
+}
+
+setInterval(function(){
+if(!reminder)return;
+const now=new Date();
+const today=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+const currentTime=String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
+
+if(today<reminder.startDate||today>reminder.endDate)return;
+
+let reminderTimes=[];
+if(reminder.frequency==="once")reminderTimes=[reminder.time1];
+if(reminder.frequency==="twice")reminderTimes=[reminder.time1,reminder.time2];
+if(reminder.frequency==="thrice")reminderTimes=[reminder.time1,reminder.time2,reminder.time3];
+
+if(reminderTimes.includes(currentTime)){
+const triggerKey=today+"_"+currentTime;
+if(lastTriggered!==triggerKey){
+lastTriggered=triggerKey;
+showNotification(reminder.medicine);
+const message=language==="ta"
+?reminder.medicine+" மருந்தை எடுத்துக்கொள்ளுங்கள்."
+:"Please take your "+reminder.medicine+" medicine.";
+speak(message);
+}
+}
+},1000);
+
+function showNotification(medicine){
+if(!("Notification" in window))return;
+if(Notification.permission==="granted"){
+new Notification("💊 Medicine Reminder",{
+body:language==="ta"?medicine+" மருந்தை எடுத்துக்கொள்ளுங்கள்.":"Please take your "+medicine+" medicine.",
+icon:"data:image/svg+xml,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><text x="50%" y="65%" text-anchor="middle" font-size="65">💊</text></svg>`)
+});
+}
+}
+
+function speak(text){
+if(!("speechSynthesis" in window)){
+alert("Voice reminder is not supported in this browser.");
+return;
+}
+
+speechSynthesis.cancel();
+const startTime=Date.now();
+
+function repeatVoice(){
+if(Date.now()-startTime>=60000){
+speechSynthesis.cancel();
+return;
+}
+
+const voice=new SpeechSynthesisUtterance(text);
+voice.lang=language==="ta"?"ta-IN":"en-US";
+voice.volume=1;
+voice.rate=.85;
+voice.pitch=1;
+
+voice.onend=function(){
+if(Date.now()-startTime<60000)repeatVoice();
+};
+
+speechSynthesis.speak(voice);
+}
+repeatVoice();
+}
+
+function testAudio(){
+const medicine=document.getElementById("medicineName").value.trim();
+const medicineName=medicine||(language==="ta"?"மருந்து":"your medicine");
+const message=language==="ta"
+?medicineName+" மருந்தை எடுத்துக்கொள்ளுங்கள்."
+:"Please take your "+medicineName+" medicine.";
+speak(message);
+}
+</script>
+</body>
+</html>
